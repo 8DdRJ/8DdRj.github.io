@@ -146,7 +146,7 @@ function animateValue(element, start, end, duration) {
     element.innerText = current.toLocaleString('de-DE') + " €";
 
     if (progress < 1) {
-      window.requestAnimationFrame(step);
+      requestAnimationFrame(step);
     } else {
       element.innerText = end.toLocaleString('de-DE') + " €";
       element.style.transform = "scale(1.08)";
@@ -156,7 +156,7 @@ function animateValue(element, start, end, duration) {
     }
   };
 
-  window.requestAnimationFrame(step);
+  requestAnimationFrame(step);
 }
 
 // Daten laden
@@ -168,8 +168,14 @@ fetch('data.json')
 
     const betragEl = document.getElementById('betrag');
 
+    // 🧠 SUMME BERECHNEN
+    let summe = 0;
+    data.einzahlungen.forEach(e => {
+      summe += Number(e.betrag);
+    });
+
     // Animation starten
-    animateValue(betragEl, 0, data.betrag, 1400);
+    animateValue(betragEl, 0, summe, 1400);
 
     // Verlauf anzeigen
     const historyDiv = document.getElementById('history');
