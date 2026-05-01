@@ -9,52 +9,73 @@
   body {
     margin: 0;
     font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, #89f7fe, #66a6ff);
     color: #fff;
+    text-align: center;
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    text-align: center;
+    background-size: cover;
+    background-position: center;
+    transition: background 1s ease;
+  }
+
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.45);
   }
 
   .card {
+    position: relative;
+    z-index: 2;
     background: rgba(255,255,255,0.15);
     backdrop-filter: blur(15px);
-    padding: 50px 30px;
+    padding: 40px 25px;
     border-radius: 25px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-    max-width: 400px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    max-width: 420px;
     width: 90%;
     animation: fadeIn 1.2s ease;
   }
 
   h1 {
-    font-size: 24px;
-    margin-bottom: 10px;
-  }
-
-  .subtitle {
-    opacity: 0.9;
-    margin-bottom: 40px;
+    font-size: 22px;
   }
 
   .betrag {
-    font-size: 70px;
+    font-size: 65px;
     font-weight: bold;
-    margin: 30px 0;
-    transition: transform 0.3s ease;
+    margin: 25px 0;
   }
 
-  .betrag.animate {
-    transform: scale(1.08);
+  .subtitle {
+    margin-bottom: 20px;
+    opacity: 0.9;
+  }
+
+  .history {
+    margin-top: 25px;
+    text-align: left;
+    max-height: 150px;
+    overflow-y: auto;
+    font-size: 14px;
+  }
+
+  .entry {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
   }
 
   .footer {
-    margin-top: 30px;
-    font-size: 14px;
+    margin-top: 20px;
+    font-size: 13px;
     opacity: 0.85;
-    line-height: 1.5;
   }
 
   @keyframes fadeIn {
@@ -66,36 +87,57 @@
 
 <body>
 
+<div class="overlay"></div>
+
 <div class="card">
   <h1 id="title"></h1>
   <div class="subtitle">Dein aktuelles Urlaubsguthaben ✈️🌴</div>
 
   <div class="betrag" id="betrag">...</div>
 
+  <div class="history" id="history"></div>
+
   <div class="footer">
-    Ich verwalte dieses Konto für dich ❤️<br>
-    Jeder Blick hier zeigt dir den aktuellen Stand
+    Ich verwalte dieses Konto für dich ❤️
   </div>
 </div>
 
 <script>
+// 🌅 Balaton Bilder
+const images = [
+  "https://images.unsplash.com/photo-1580657018950-c7f7d6a6d990",
+  "https://images.unsplash.com/photo-1590080874088-eec64895b423",
+  "https://images.unsplash.com/photo-1602524815607-c0bcbf0f6b82",
+  "https://images.unsplash.com/photo-1593696954577-ab3d39317b97"
+];
+
+// zufälliges Bild setzen
+const randomImage = images[Math.floor(Math.random() * images.length)];
+document.body.style.backgroundImage = `url(${randomImage})`;
+
+// Daten laden
 fetch('data.json')
   .then(res => res.json())
   .then(data => {
 
-    const betragEl = document.getElementById('betrag');
-    const title = document.getElementById('title');
+    document.getElementById('title').innerText = "Für " + data.name;
+    document.getElementById('betrag').innerText = 
+      data.betrag.toLocaleString('de-DE') + " €";
 
-    // Titel personalisieren
-    title.innerText = "Für " + data.name;
+    // Verlauf anzeigen (neueste oben)
+    const historyDiv = document.getElementById('history');
 
-    // Betrag anzeigen
-    betragEl.innerText = data.betrag.toLocaleString('de-DE') + " €";
+    data.einzahlungen.slice().reverse().forEach(e => {
+      const entry = document.createElement('div');
+      entry.className = 'entry';
 
-    // kleine Animation
-    setTimeout(() => {
-      betragEl.classList.add('animate');
-    }, 300);
+      entry.innerHTML = `
+        <span>${e.datum}</span>
+        <span>+${e.betrag.toLocaleString('de-DE')} €</span>
+      `;
+
+      historyDiv.appendChild(entry);
+    });
 
   });
 </script>
