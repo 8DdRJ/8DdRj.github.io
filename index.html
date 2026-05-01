@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Urlaubskonto</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #89f7fe, #66a6ff);
+    color: #fff;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .card {
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(15px);
+    padding: 40px;
+    border-radius: 25px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    max-width: 400px;
+    width: 90%;
+    animation: fadeIn 1.2s ease;
+  }
+
+  h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  .subtitle {
+    opacity: 0.9;
+    margin-bottom: 30px;
+  }
+
+  .betrag {
+    font-size: 55px;
+    font-weight: bold;
+    margin: 20px 0;
+    transition: transform 0.3s ease;
+  }
+
+  .betrag.animate {
+    transform: scale(1.1);
+  }
+
+  .progress-container {
+    background: rgba(255,255,255,0.2);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-top: 25px;
+  }
+
+  .progress-bar {
+    height: 15px;
+    width: 0%;
+    background: #fff;
+    border-radius: 20px;
+    transition: width 1.5s ease;
+  }
+
+  .ziel {
+    margin-top: 10px;
+    font-size: 14px;
+    opacity: 0.9;
+  }
+
+  .footer {
+    margin-top: 30px;
+    font-size: 14px;
+    opacity: 0.8;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h1 id="title">Für deinen nächsten Traumurlaub ✈️🌴</h1>
+  <div class="subtitle">Ein kleines Geschenk – das mit der Zeit wächst ❤️</div>
+
+  <div class="betrag" id="betrag">...</div>
+
+  <div class="progress-container">
+    <div class="progress-bar" id="progress"></div>
+  </div>
+
+  <div class="ziel" id="zielText"></div>
+
+  <div class="footer">
+    Ich spare für dich, damit du dir eine wunderschöne Reise gönnen kannst 🌍
+  </div>
+</div>
+
+<script>
+fetch('data.json')
+  .then(res => res.json())
+  .then(data => {
+
+    const betragEl = document.getElementById('betrag');
+    const progressEl = document.getElementById('progress');
+    const zielText = document.getElementById('zielText');
+    const title = document.getElementById('title');
+
+    // Name einsetzen
+    title.innerText = "Für " + data.name + " – deinen nächsten Traumurlaub ✈️🌴";
+
+    // Betrag anzeigen
+    betragEl.innerText = data.betrag.toLocaleString('de-DE') + " €";
+
+    // Animation
+    setTimeout(() => {
+      betragEl.classList.add('animate');
+    }, 300);
+
+    // Progress berechnen
+    let percent = (data.betrag / data.ziel) * 100;
+    percent = Math.min(percent, 100);
+
+    setTimeout(() => {
+      progressEl.style.width = percent + "%";
+    }, 500);
+
+    zielText.innerText = 
+      Math.round(percent) + "% von " + data.ziel.toLocaleString('de-DE') + " € erreicht";
+
+  });
+</script>
+
+</body>
+</html>
