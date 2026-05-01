@@ -1,10 +1,9 @@
 {
-  "betrag": 700,
   "name": "Mama ❤️",
   "einzahlungen": [
-    { "datum": "01.05.2026", "betrag": 200 },
-    { "datum": "01.05.2026", "betrag": 200 },
     { "datum": "24.12.2025", "betrag": 150 },
-    { "datum": "24.12.2025", "betrag": 150 }
+    { "datum": "24.12.2025", "betrag": 150 },
+    { "datum": "01.05.2026", "betrag": 200 },
+    { "datum": "01.05.2026", "betrag": 100 }
   ]
 }
