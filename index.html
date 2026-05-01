@@ -2,85 +2,116 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Urlaubskonto</title>
 
 <style>
   body {
     margin: 0;
-    font-family: 'Segoe UI', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     color: #fff;
     text-align: center;
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
+    background-image: url('https://wallpapercave.com/wp/wp1887408.jpg');
     background-size: cover;
     background-position: center;
-    transition: background 1s ease;
+    background-repeat: no-repeat;
+    padding: 20px;
+    box-sizing: border-box;
   }
 
   .overlay {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0,0,0,0.45);
+    background: linear-gradient(
+      rgba(0,0,0,0.45),
+      rgba(0,0,0,0.7)
+    );
+    z-index: 1;
   }
 
   .card {
     position: relative;
     z-index: 2;
     background: rgba(255,255,255,0.15);
-    backdrop-filter: blur(15px);
-    padding: 40px 25px;
-    border-radius: 25px;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    padding: 30px 20px;
+    border-radius: 20px;
     box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    width: 100%;
     max-width: 420px;
-    width: 90%;
-    animation: fadeIn 1.2s ease;
+    animation: fadeIn 1s ease;
   }
 
   h1 {
-    font-size: 22px;
-  }
-
-  .betrag {
-    font-size: 65px;
-    font-weight: bold;
-    margin: 25px 0;
+    font-size: 20px;
+    margin-bottom: 8px;
   }
 
   .subtitle {
-    margin-bottom: 20px;
+    margin-bottom: 15px;
+    font-size: 14px;
     opacity: 0.9;
   }
 
+  .betrag {
+    font-size: 52px;
+    font-weight: bold;
+    margin: 20px 0;
+    line-height: 1.1;
+  }
+
   .history {
-    margin-top: 25px;
+    margin-top: 15px;
     text-align: left;
-    max-height: 150px;
+    max-height: 140px;
     overflow-y: auto;
-    font-size: 14px;
+    font-size: 13px;
+    padding-right: 5px;
   }
 
   .entry {
     display: flex;
     justify-content: space-between;
-    padding: 5px 0;
+    padding: 6px 0;
     border-bottom: 1px solid rgba(255,255,255,0.2);
   }
 
   .footer {
-    margin-top: 20px;
-    font-size: 13px;
+    margin-top: 15px;
+    font-size: 12px;
     opacity: 0.85;
+    line-height: 1.4;
+  }
+
+  .history::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .history::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.3);
+    border-radius: 10px;
   }
 
   @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(25px); }
+    from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-height: 600px) {
+    .betrag {
+      font-size: 42px;
+    }
+    .history {
+      max-height: 100px;
+    }
   }
 </style>
 </head>
@@ -93,7 +124,7 @@
   <h1 id="title"></h1>
   <div class="subtitle">Dein aktuelles Urlaubsguthaben ✈️🌴</div>
 
-  <div class="betrag" id="betrag">...</div>
+  <div class="betrag" id="betrag">0 €</div>
 
   <div class="history" id="history"></div>
 
@@ -103,17 +134,30 @@
 </div>
 
 <script>
-// 🌅 Balaton Bilder
-const images = [
-  "https://images.unsplash.com/photo-1580657018950-c7f7d6a6d990",
-  "https://images.unsplash.com/photo-1590080874088-eec64895b423",
-  "https://images.unsplash.com/photo-1602524815607-c0bcbf0f6b82",
-  "https://images.unsplash.com/photo-1593696954577-ab3d39317b97"
-];
+// Count-Up Animation
+function animateValue(element, start, end, duration) {
+  let startTimestamp = null;
 
-// zufälliges Bild setzen
-const randomImage = images[Math.floor(Math.random() * images.length)];
-document.body.style.backgroundImage = `url(${randomImage})`;
+  const step = (timestamp) => {
+    if (!startTimestamp) startTimestamp = timestamp;
+    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+
+    const current = Math.floor(progress * (end - start) + start);
+    element.innerText = current.toLocaleString('de-DE') + " €";
+
+    if (progress < 1) {
+      window.requestAnimationFrame(step);
+    } else {
+      element.innerText = end.toLocaleString('de-DE') + " €";
+      element.style.transform = "scale(1.08)";
+      setTimeout(() => {
+        element.style.transform = "scale(1)";
+      }, 200);
+    }
+  };
+
+  window.requestAnimationFrame(step);
+}
 
 // Daten laden
 fetch('data.json')
@@ -121,10 +165,13 @@ fetch('data.json')
   .then(data => {
 
     document.getElementById('title').innerText = "Für " + data.name;
-    document.getElementById('betrag').innerText = 
-      data.betrag.toLocaleString('de-DE') + " €";
 
-    // Verlauf anzeigen (neueste oben)
+    const betragEl = document.getElementById('betrag');
+
+    // Animation starten
+    animateValue(betragEl, 0, data.betrag, 1400);
+
+    // Verlauf anzeigen
     const historyDiv = document.getElementById('history');
 
     data.einzahlungen.slice().reverse().forEach(e => {
