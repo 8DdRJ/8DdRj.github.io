@@ -3,7 +3,7 @@
   "einzahlungen": [
     { "datum": "24.12.2025", "betrag": 150 },
     { "datum": "24.12.2025", "betrag": 150 },
-    { "datum": "01.05.2026", "betrag": 200 },
+    { "datum": "01.05.2026", "betrag": 100 },
     { "datum": "01.05.2026", "betrag": 100 },
     { "datum": "10.05.2026", "betrag": 25 },
     { "datum": "10.05.2026", "betrag": 50 }
